@@ -14,4 +14,4 @@ def reverse(x: int)-> int:
 
 a = int(input('Введите число:'))
 z = reverse(a)
-print(z)
+print(f'Из числа {a} получилось число {z}')
