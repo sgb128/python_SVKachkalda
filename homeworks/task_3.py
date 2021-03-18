@@ -5,15 +5,16 @@
 в другой — не больше медианы.
 """
 import random
+import statistics
 
 #         1   2  3   4   5  6   7  8   9 10  11  12  13  14  15 16 17  18  19  20  21
-ARRAY = [49, 45, 4, 27, 48, 2, 37, 0, 27, 6, 16, 12, 27, 50, 26, 0, 1, 46, 50, 40, 13]
+ARRAY = [49, 45, 4, 27, 48, 2, 37, 0, 27]  # , 6, 16, 12, 27, 50, 26, 0, 1, 46, 50, 40, 13]
 M = 10
 # ARRAY = [random.randint(0, 50) for _ in range(2 * M + 1)]
 
 
 # пытаюсь реализовать алгоритм BFPRT описанный по ссылке:
-# http://www.mathnet.ru/links/df955578498bdb2984b665f99ea98f63/mp894.pdf
+# https://ru.wikipedia.org/wiki/Алгоритм_выбора
 def split_array(data: list):
     x = data[len(data)//2]
     # print(x)
@@ -45,15 +46,20 @@ def find_median(data):
                 median_array.append(b)
             else:
                 median_array.append(c)
-        return find_median(median_array)
+        return find_median(split_array(median_array))
     else:
-        a, b, c = data[0], data[1], data[2]
-        if b < a < c or c < a < b:
-            return a
-        elif a < b < c or c < b < a:
-            return b
+        if len(data) == 1:
+            return data[0]
+        elif len(data) == 2:
+            return data[0]
         else:
-            return c
+            a, b, c = data[0], data[1], data[2]
+            if b < a < c or c < a < b:
+                return a
+            elif a < b < c or c < b < a:
+                return b
+            else:
+                return c
 
 
 # попытка за 5 минут решить задачу простым способом, но что-то я видимо устал и алгоритм получился неверный
@@ -71,5 +77,7 @@ def find_median_simple(data):
             return data[left]
 
 
-res = find_median_simple(ARRAY)
+res = find_median(split_array(ARRAY))
 print(res)
+# для проверки
+print(statistics.median(ARRAY))
