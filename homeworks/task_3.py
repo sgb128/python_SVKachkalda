@@ -4,80 +4,82 @@
 Медианой называется элемент ряда, делящий его на две равные части: в одной находятся элементы, которые не меньше медианы,
 в другой — не больше медианы.
 """
+
 import random
 import statistics
 
-#         1   2  3   4   5  6   7  8   9 10  11  12  13  14  15 16 17  18  19  20  21
-ARRAY = [49, 45, 4, 27, 48, 2, 37, 0, 27]  # , 6, 16, 12, 27, 50, 26, 0, 1, 46, 50, 40, 13]
-M = 10
-# ARRAY = [random.randint(0, 50) for _ in range(2 * M + 1)]
+arr = [random.randint(0,50) for _ in range(21)]
+
+
+# сортировка грабл... расческой
+def pitchfork(data):
+    ln = len(data)
+    step = (ln * 10 // 13) if ln > 1 else 0  #
+    while step:
+        if 8 < step < 11:
+            step = 11
+        is_moved = False
+        for i in range(ln - step):
+            if data[i + step] < data[i]:
+                data[i], data[i + step] = data[i + step], data[i]
+                is_moved = True
+        step = (step * 10 // 13) or is_moved
 
 
 # пытаюсь реализовать алгоритм BFPRT описанный по ссылке:
 # https://ru.wikipedia.org/wiki/Алгоритм_выбора
-def split_array(data: list):
-    x = data[len(data)//2]
-    # print(x)
-    left = 0
-    right = len(data)-1
-    while right > left:
-        # print(data, left, right)
-        if data[left] > x >= data[right]:
-            data[left], data[right] = data[right], data[left]
-            left += 1
-            right -= 1
+def choise_middle(data):
+    div_x = 3
+    ln = len(data)
+    middles = []
+
+    print(data)
+    # print(f'{ln=}')
+    if ln == 3:
+        a = data[0]
+        b = data[1]
+        c = data[2]
+        if b < a < c or c < a < b:
+            return a
+        elif a < b < c or c < b < a:
+            return b
         else:
-            if data[left] <= x:
-                left += 1
-            if data[right] > x:
-                right -= 1
-    return data
+            return c
+    elif ln == 1:
+        return data[0]
+
+    while ln % div_x % 2 == 0 and div_x < ln:
+        # print(div_x, ln, ln % 2)
+        div_x += 2
+
+    if div_x == ln:
+        return data[ln//2]
+    # print(f'{div_x=}')
+    for i in range(ln // div_x):
+        # print(ln, div_x * i, ln // div_x + ln // div_x * i)
+        # print(data[div_x * i: div_x + div_x * i])
+        if len(data[div_x * i: div_x + div_x * i]):
+            middles.append(choise_middle(data[div_x * i: div_x + div_x * i]))
+    if len(data[ln - ln % div_x:]):
+        middles.append(choise_middle(data[ln - ln % div_x:]))
+
+    # print(len(middles))
+    pitchfork(middles)
+    # print(middles)
+    return middles[len(middles)//2]
 
 
-def find_median(data):
-    median_array = []
-    if len(data) > 3:
-        for i in range(len(data)//3):
-            # print(data[(i*3)], data[1+(i*3)], data[2+(i*3)])
-            a, b, c = data[(i * 3)], data[1 + (i * 3)], data[2 + (i * 3)]
-            if b < a < c or c < a < b:
-                median_array.append(a)
-            elif a < b < c or c < b < a:
-                median_array.append(b)
-            else:
-                median_array.append(c)
-        return find_median(split_array(median_array))
-    else:
-        if len(data) == 1:
-            return data[0]
-        elif len(data) == 2:
-            return data[0]
-        else:
-            a, b, c = data[0], data[1], data[2]
-            if b < a < c or c < a < b:
-                return a
-            elif a < b < c or c < b < a:
-                return b
-            else:
-                return c
-
-
-# попытка за 5 минут решить задачу простым способом, но что-то я видимо устал и алгоритм получился неверный
-# если придет решение то этот алгоритм удалю
-def find_median_simple(data):
-    for i in range(len(data)):
-        left = right = 0
-        for j in range(len(data)):
-            if data[j] != data[i]:
-                if data[j] > data[i]:
-                    left += 1
-                else:
-                    right += 1
-        if left == right:
-            return data[left]
-
-
-res = find_median(split_array(ARRAY))
-print(res)
-# для проверки
-print(statistics.median(ARRAY))
+median_val = choise_middle(arr)
+print('Исходный массив:')
+print(arr)
+print('Сортирую для наглядности:')
+pitchfork(arr)
+print(arr)
+print('#########################################')
+print('Мой результат:')
+print(median_val)
+print('Проверка:')
+checked_val = statistics.median(arr);
+print(statistics.median(arr))
+if checked_val != median_val:
+    print('Сдаюсь! Не знаю как... 8 часов и правильная реализация алгоритма привели меня к неверному результату.')
